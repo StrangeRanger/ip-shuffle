@@ -1,0 +1,358 @@
+#!/usr/bin/env bash
+#
+# Name: ip-shuffle
+#
+# Description:
+#   This script is used to assign a random IP address to a network interface.
+#
+# Note:
+#   This script can be enhanced by either keeping a list of existing IP addresses that
+#   are in use or by checking the ARP table for existing IP addresses.
+#
+# Limitations:
+#   If machines are configured via DHCP, the change of IP addresses will not persist
+#   after a reboot.
+#
+# Valid Operating Systems:
+#   - Linux
+#   - FreeBSD
+#
+# Version: v1.0.0
+# License: MIT License
+#          Copyright (c) 2024 Hunter T. (StrangeRanger)
+#
+########################################################################################
+####[ Variables ]#######################################################################
+####[[ Modifiable Variables ]]##########################################################
+
+
+## Set to true if you want to output the script's output to a file and the console.
+_OUTPUT_TO_FILE=false
+readonly _OUTPUT_TO_FILE
+
+## All the variables below should be modified to meet your network configurations.
+gateway="192.168.1.1"
+base_ip="192.168.1."
+ip_start=2
+ip_end=254
+interface="enp0s5"  # Often used on Linux.
+#interface="em0"    # Often used on FreeBSD.
+netmask="255.255.255.0"
+netmask_cidr="24"
+
+
+####[[ General Variables ]]#############################################################
+
+
+_OS=$(uname -s)
+readonly _OS
+
+yellow="$(printf '\033[1;33m')"
+green="$(printf '\033[0;32m')"
+blue="$(printf '\033[0;34m')"
+cyan="$(printf '\033[0;36m')"
+red="$(printf '\033[1;31m')"
+nc="$(printf '\033[0m')"
+
+if [[ $_OUTPUT_TO_FILE == true ]]; then
+    exec > >(
+        while IFS= read -r line; do
+            printf "[%s] %s\n" "$(date "+%Y-%m-%d %H:%M:%S")" "$line"
+        done | tee -a "/var/log/ip-shuffle.log"
+    )
+    exec 2>&1
+
+    note="[INFO]"
+    info="[INFO]"
+    error="[ERROR]"
+    warning="[WARNING]"
+    notice="[NOTICE]"
+    success="[INFO]"
+else
+    note="${cyan}[INFO]${nc}"
+    info="${blue}[INFO]${nc}"
+    error="${red}[ERROR]${nc}"
+    warning="${yellow}[WARNING]${nc}"
+    notice="${yellow}[NOTICE]${nc}"
+    success="${green}[INFO]${nc}"
+fi
+
+
+####[ Functions ]#######################################################################
+
+
+####
+# Description:
+#   Generate a random IP address within a range, specified by the network variables
+#   above.
+generate_random_ip() {
+    local ip="$base_ip$((RANDOM % (ip_end - ip_start + 1) + ip_start))"
+    echo "$ip"
+}
+
+####
+# Description:
+#   Check if the given IP address is available on the network.
+#
+# Parameters:
+#   - $1: ip (Required)
+#       - Description: The IP address to check.
+#
+# Returns:
+#   - 0: If the IP address is not available.
+#   - 1: If the IP address is available.
+check_ip_availability() {
+    local ip="$1"
+
+    echo "${info} Checking IP address availability of '$ip'..."
+
+    if ping -c 1 -W 1 "$ip" &>/dev/null; then
+        echo "${warning} IP $ip is already in use."
+        return 1
+    fi
+
+    return 0
+}
+
+####
+# Description:
+#   Validate network configuration.
+#
+# Parameters:
+#   - $1: ip (Required)
+#       - Description: The IP address to validate.
+#
+# Returns:
+#   - 0: If the IP address is in the same subnet as the gateway.
+#   - 1: If the IP address is not in the same subnet as the gateway.
+validate_network_config() {
+    local ip="$1"
+
+    echo "${info} Validating network configuration for IP '$ip'..."
+
+    IFS=. read -r i1 i2 i3 i4 <<< "$ip"
+    IFS=. read -r g1 g2 g3 g4 <<< "$gateway"
+    IFS=. read -r m1 m2 m3 m4 <<< "$netmask"
+
+    # Perform bitwise AND to see if base of IP and gateway match.
+    if (( (i1 & m1) != (g1 & m1) )) \
+            || (( (i2 & m2) != (g2 & m2) )) \
+            || (( (i3 & m3) != (g3 & m3) )) \
+            || (( (i4 & m4) != (g4 & m4) )); then
+        echo "${error} IP address $ip is not in the same subnet as the gateway" \
+             "$gateway with netmask $netmask."
+        return 1
+    fi
+
+    return 0
+}
+
+####
+# Description:
+#   Check gateway reachability.
+#
+# Returns:
+#   - 0: If the gateway is reachable.
+#   - 1: If the gateway is not reachable.
+check_gateway_reachability() {
+    echo "${info} Checking reachability of gateway: $gateway"
+
+    if ! ping -c 3 -W 2 "$gateway" &>/dev/null; then
+        echo "${error} Gateway $gateway is not reachable."
+        return 1
+    fi
+
+    return 0
+}
+
+####
+# Description:
+#   Set the IP address of the network interface.
+#
+# Parameters:
+#   - $1: ip (Required)
+#       - Description: The IP address to set.
+set_ip_address() {
+    local ip="$1"
+
+    echo "${info} Setting IP address to '$ip' on interface '$interface'..."
+
+    {
+        if hash ip &>/dev/null; then
+            ip addr flush dev "$interface" \
+            && ip addr add "$ip"/"$netmask_cidr" dev "$interface" \
+            && {
+                ip route del default \
+                || echo "${notice} No default route to delete."
+            } \
+            && ip link set "$interface" up \
+            && ip route add default via "$gateway"
+        else
+            case $_OS in
+                *BSD)
+                    ifconfig "$interface" inet "$ip" netmask "$netmask" \
+                    && {
+                        route delete default \
+                        || echo "${notice} No default route to delete."
+                    } \
+                    && route add default "$gateway"
+                    ;;
+                Linux)
+                    ifconfig "$interface" "$ip" netmask "$netmask" \
+                    && route add default gw "$gateway"
+                    ;;
+            esac
+        fi
+    } || {
+        echo "${error} An error occurred while trying to set a new IP Address."
+        reset_network
+        clean_exit 1
+    }
+}
+
+####
+# Description:
+#   Reset network configurations on Linux and BSD. This is used as a fallback method if
+#   setting a new IP address fails.
+reset_network() {
+    echo "${note} Resetting network configurations on $_OS..."
+    echo "${info} Renewing DHCP lease on $_OS for interface '$interface'..."
+
+    if dhclient "$interface"; then
+        echo "${success} DHCP lease successfully renewed on $_OS."
+    else
+        echo "${error} Failed to renew DHCP lease on $_OS."
+    fi
+
+}
+
+####
+# Description:
+#   Generate a random sleep time between the given range.
+#
+# Parameters:
+#   - $1: min (Optional)
+#       - Description: The minimum sleep time.
+#       - Default: 1
+#   - $2: max (Optional)
+#       - Description: The maximum sleep time.
+#       - Default: 30
+#
+# Note:
+#   - The sleep time is a random number between the min and max values. This is to
+#     reduce the likelihood of multiple machines try to assign an IP address at the same
+#     time.
+#
+# shellcheck disable=SC2120
+timed_sleep() {
+    local min="${1:-1}"
+    local max="${2:-30}"
+    local sleep_time=$((RANDOM % (max - min + 1) + min))
+
+    echo "${info} Sleeping for $sleep_time seconds..."
+    sleep $sleep_time
+}
+
+####
+# Description:
+#   Cleanly exit the script.
+#
+# Parameters:
+#   - $1: exit_code (Required)
+#       - Description: The type of exit that occurred.
+#       - Acceptable values:
+#           - 0: Clean exit.
+#           - 1: Error occurred.
+#           - 130: User interruption.
+#           - 143: User interruption.
+clean_exit() {
+    local exit_code="$1"
+
+    #if [[ $exit_code == "1" ]]; then
+    #    echo "${error} An error occurred"
+    #elif [[ $exit_code == "130" ||  $exit_code == "143" ]]; then
+    if [[ $exit_code == "130" ||  $exit_code == "143" ]]; then
+        echo ""
+        echo "${warning} Interruption detected"
+    fi
+
+    echo "${note} Exiting script..."
+    exit "$exit_code"
+}
+
+
+####[ Error Traps ]#####################################################################
+#### This section sets up error traps to ensure that the script exits gracefully.
+
+
+trap 'clean_exit "130"' SIGINT
+trap 'clean_exit "143"' SIGTERM
+
+
+####[ Verification ]####################################################################
+#### This section ensures that certain conditions are met before the script continues.
+
+
+if [[ $EUID -ne 0 ]]; then
+    echo "${error} This script must be run as root."
+    clean_exit 1
+fi
+
+if ! hash ip &>/dev/null && ! hash ifconfig &>/dev/null; then
+    echo "${error} ip and ifconfig command not found."
+    clean_exit 1
+fi
+
+case $_OS in
+    *BSD)
+        if ! ifconfig "$interface" &>/dev/null; then
+            echo "${error} Network interface '$interface' not found."
+            clean_exit 1
+        fi
+        ;;
+    Linux)
+        if ! ip addr show "$interface" &>/dev/null; then
+            echo "${error} Network interface '$interface' not found."
+            clean_exit 1
+        fi
+        ;;
+    *)
+        echo "${error} Unsupported operating system."
+        clean_exit 1
+        ;;
+esac
+
+
+####[ Main ]############################################################################
+
+
+new_ip="$(generate_random_ip)"
+
+echo "${note} Starting IP Shuffle..."
+
+while true; do
+    timed_sleep
+
+    if ! check_ip_availability "$new_ip"; then
+        echo "${info} Trying a different IP..."
+        new_ip="$(generate_random_ip)"
+        continue
+    fi
+
+    if ! validate_network_config "$new_ip"; then
+        echo "${note} Ensure network configurations are correctly set in the script."
+        reset_network
+        clean_exit 1
+    fi
+
+    set_ip_address "$new_ip"
+
+    if ! check_gateway_reachability; then
+        echo "${note} Ensure the gateway is correctly set in the script."
+        reset_network
+        clean_exit 1
+    fi
+
+    echo "${success} IP address set successfully."
+    break
+done
