@@ -1,1 +1,46 @@
-This is our evaluation.
+To evaluate the effectiveness of our IP shuffling script, we'll be adding an extra system to the virtual network with a static IP address of \texttt{192.168.1.10}. We'll be setting up an OPNsense instance as the default gateway for all virtual machines. This instance will be assigned the IP address \texttt{192.168.1.1}, and it will act as a simulated router that provides the DHCP service. As shown in Figure 1, there will be two Ubuntu Linux machines and one instance of FreeBSD. Each machine will receive an IP address on initial startup starting at \texttt{192.168.1.100}, assigned by OPNsense. We'll give each system 6 minutes after startup to begin changing its IP address, after which we'll use an arp-scan to obtain the following output:
+\begin{verbatim}
+192.168.1.1     00:1c:42:c1:e4:da       (Unknown)
+192.168.1.103   00:1c:42:c6:34:d1       (Unknown)
+192.168.1.200   00:1c:42:98:99:4d       (Unknown)
+192.168.1.236   00:1c:42:76:c0:7e       (Unknown)
+\end{verbatim}
+We can observe that the IP addresses, with the exception of the OPNsense instance, have been altered from their initially assigned addresses through DHCP. To check if the systems have changed their IPs once more, let's wait for another six minutes and then conduct another ARP scan. Here are the results of the said scan:
+\begin{verbatim}
+192.168.1.1     00:1c:42:c1:e4:da       (Unknown)
+192.168.1.71    00:1c:42:76:c0:7e       (Unknown)
+192.168.1.199   00:1c:42:c6:34:d1       (Unknown)
+192.168.1.211   00:1c:42:98:99:4d       (Unknown)
+\end{verbatim}
+Let's cross-check the modified IP addresses with their respective MAC addresses for a clearer understanding of their altered IPs.
+
+\begin{tikzpicture}[ 
+  node distance=1cm and 1.5cm,
+  box/.style={rectangle, draw, minimum height=1cm, minimum width=4cm, align=center},
+  arrow/.style={-Stealth, thick},
+  scale=\linewidth/10cm, transform shape
+]
+
+  % Original IP-MAC pairs
+  \node[box] (old1) {192.168.1.1\\00:1c:42:c1:e4:da};
+  \node[box, below=of old1] (old2) {192.168.1.103\\00:1c:42:c6:34:d1};
+  \node[box, below=of old2] (old3) {192.168.1.200\\00:1c:42:98:99:4d};
+  \node[box, below=of old3] (old4) {192.168.1.236\\00:1c:42:76:c0:7e};
+
+  % New IP-MAC pairs
+  \node[box, right=of old1] (new1) {192.168.1.1\\00:1c:42:c1:e4:da};
+  \node[box, below=of new1] (new2) {192.168.1.199\\00:1c:42:c6:34:d1};
+  \node[box, below=of new2] (new3) {192.168.1.211\\00:1c:42:98:99:4d};
+  \node[box, below=of new3] (new4) {192.168.1.71\\00:1c:42:76:c0:7e};
+
+  % Arrows showing changes
+  \draw[arrow] (old1) -- (new1);
+  \draw[arrow] (old2) -- (new2);
+  \draw[arrow] (old3) -- (new3);
+  \draw[arrow] (old4) -- (new4);
+
+  % Labels
+  \node[above=of old1] (labelOld) {\textbf{Initial ARP Scan}};
+  \node[above=of new1] (labelNew) {\textbf{ARP Scan After 3 Minutes}};
+
+\end{tikzpicture}
