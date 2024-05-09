@@ -1,6 +1,6 @@
 LATEX=pdflatex
 FLAGS=-interaction=nonstopmode -halt-on-error -file-line-error
-TARGET=midterm
+TARGET=Writeup
 
 .PHONY: ${TARGET}.pdf
 ${TARGET}.pdf:
