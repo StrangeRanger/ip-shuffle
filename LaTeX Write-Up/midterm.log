@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.12)  9 MAY 2024 08:26
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.12)  9 MAY 2024 08:55
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -837,17 +837,17 @@ local/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc}
 
 
 ]
-<diagram.jpeg, id=37, 754.31813pt x 596.2275pt>
-File: diagram.jpeg Graphic file (type jpg)
-<use diagram.jpeg>
-Package pdftex.def Info: diagram.jpeg  used on input line 35.
-(pdftex.def)             Requested size: 252.94499pt x 199.93077pt.
+<diagram.png, id=38, 1164.35pt x 901.3675pt>
+File: diagram.png Graphic file (type png)
+<use diagram.png>
+Package pdftex.def Info: diagram.png  used on input line 17.
+(pdftex.def)             Requested size: 252.94499pt x 195.81203pt.
 
-Overfull \hbox (11.9246pt too wide) in paragraph at lines 35--36
+Overfull \hbox (11.9246pt too wide) in paragraph at lines 17--18
  [][] 
  []
 
-) (./evaluation.tex) (./conclusion.tex) (./midterm.bbl) [2 <./diagram.jpeg>]
+) (./evaluation.tex) (./conclusion.tex) (./midterm.bbl) [2 <./diagram.png>]
 (./midterm.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
@@ -857,18 +857,18 @@ Package rerunfilecheck Info: File `midterm.out' has not changed.
 (rerunfilecheck)             Checksum: 5C657E5AB2FFEFBE6B11843E415079EA;531.
  ) 
 Here is how much of TeX's memory you used:
- 22509 strings out of 474116
- 416939 string characters out of 5743682
+ 22521 strings out of 474116
+ 417034 string characters out of 5743682
  1946187 words of memory out of 5000000
  44320 multiletter control sequences out of 15000+600000
- 591555 words of font info for 159 fonts, out of 8000000 for 9000
+ 592075 words of font info for 167 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 102i,9n,107p,1004b,680s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 102i,9n,107p,1004b,685s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/
 local/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texl
 ive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2024/t
 exmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on midterm.pdf (2 pages, 129213 bytes).
+Output written on midterm.pdf (2 pages, 486156 bytes).
 PDF statistics:
  73 PDF objects out of 1000 (max. 8388607)
  58 compressed objects within 1 object stream
