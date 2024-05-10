@@ -1,0 +1,41 @@
+The \texttt{ip-shuffle} script provides a systematic approach to dynamic IP address assignment for network interfaces in Linux and FreeBSD environments. Built around Bash scripting, it orchestrates the IP address allocation process seamlessly. By default, the program runs every three minutes based on a cronjob, dynamically configuring the IP address, gateway, and network interface details. This ensures an efficient and flexible network configuration.
+
+\subsection{Components and Functions}
+The core of the \texttt{ip-shuffle} script relies on modular functions that handle IP address generation, availability verification, and network configuration validation. The primary functions include:
+\begin{itemize}
+    \item \textbf{\texttt{generate\_random\_ip()}:}  
+        Generates a random IP address within a specified subnet range.
+    \item \textbf{\texttt{check\_ip\_availability()}:}  
+        Verifies whether the generated IP address is available using the \texttt{ping} command.    
+    \item \textbf{\texttt{validate\_network\_config()}:}  
+        Validates that the newly assigned IP address works correctly within the network by checking gateway reachability.
+    \item \textbf{\texttt{reset\_network()}:}  
+        Resets network configurations in case of errors to restore connectivity.
+\end{itemize}
+
+\subsection{IP Address Assignment Workflow}
+The workflow of the \texttt{ip-shuffle} script follows these steps:
+\begin{enumerate}
+    \item \textbf{Generate a Random IP Address:} 
+    	The script uses \texttt{generate\_random\_ip()} to produce a new IP address.
+    \item \textbf{Check Availability:} 
+    	The script verifies if the generated IP address is available using \texttt{check\_ip\_availability()}.
+    \item \textbf{Configure Network Interface:}
+    	Depending on the OS, the script will either configure a specified interface using \texttt{ip} or \texttt{ifconfig}.
+    \item \textbf{Validate Network Configuration:}
+    	The script ensures proper network configuration by testing gateway reachability via \texttt{validate\_network\_config()}.
+    \item \textbf{Reset Network if Needed:} 
+    	If the new IP address is invalid or unreachable, the \texttt{reset\_network()} function is called to restore network connectivity.
+\end{enumerate}
+
+\subsection{Scheduling with Cron}
+To ensure regular IP address rotation, the \texttt{ip-shuffle} script is scheduled with a cronjob that runs every three minutes:
+\begin{verbatim}
+# Recommended placement: /usr/local/sbin/ip-shuffle
+*/3 * * * * /path/to/ip-shuffle
+\end{verbatim}
+This systematic rotation of IP addresses complicates reconnaissance and lateral movement for potential attackers, forcing them to continually rescan the network.
+
+\subsection{Error Handling and Signal Support}
+The \texttt{ip-shuffle} script incorporates error-trapping mechanisms and Unix signal support to enhance reliability and resilience. Common Unix signals such as \texttt{SIGINT} and\texttt{SIGTERM} are handled gracefully, allowing the script to clean up network configurations if interrupted unexpectedly.
+This ensures that network configurations remain intact even in the face of unexpected interruptions.

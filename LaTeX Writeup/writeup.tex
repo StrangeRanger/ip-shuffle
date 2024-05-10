@@ -1,79 +1,77 @@
-
 \documentclass[letterpaper,twocolumn,10pt]{article}
+% ...
+\usepackage{graphicx}
+% ...
 \usepackage{usenix-2020-09}
-
-% to be able to draw some self-contained figs
+% ...
 \usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta}
+% ...
 \usepackage{amsmath}
-
 % inlined bib file
 \usepackage{filecontents}
 
-
 %-------------------------------------------------------------------------------
+
 \begin{document}
+
 %-------------------------------------------------------------------------------
 
-%don't want date printed
+% Date won't be printed.
 \date{}
 
-% make title bold and 14 pt font (Latex default is non-bold, 16 pt)
 \title{\Large \bf IP Shuffle:\\
-  Random IP Address Assignment for Network Interfaces}
+Random IP Address Assignment for Network Interfaces}
 
-%for single author (just remove % characters)
 \author{
 {\rm Hunter Thompson}\\
 Eastern Washington University
 \and
 {\rm Chelsea Edwards}\\
 Eastern Washington University
-% copy the following lines to add more authors
-% \and
-% {\rm Name}\\
-%Name Institution
 } % end author
 
 \maketitle
 
 %-------------------------------------------------------------------------------
+
 \begin{abstract}
-%-------------------------------------------------------------------------------
-This paper introduces a Bash script designed to dynamically assign a random IP address to a computer's network interface. The script generates a random IP address within a specified range, checks its availability, and ensures proper configuration. It achieves efficient and reliable IP address assignment through distinct functions for IP address generation, availability verification, network configuration validation, and gateway reachability testing. The IP-shuffle script provides a practical solution for scenarios that require dynamic IP address allocation and streamlining network management processes. Its robustness is further enhanced by comprehensive error handling and compatibility with Linux and BSD systems.
+\input{abstract}
 \end{abstract}
 
-
 %-------------------------------------------------------------------------------
+
 \section{Introduction}
-%-------------------------------------------------------------------------------
-\input{intro}
+\input{introduction}
 
 %-------------------------------------------------------------------------------
-\section{Threat Background}
-%-------------------------------------------------------------------------------
-\input{background}
+
+\section{Threat Model}
+\input{threat-model}
 
 %-------------------------------------------------------------------------------
+
 \section{System Design}
+\input{system-design}
 
-\input{eval}
 %-------------------------------------------------------------------------------
-%-------------------------------------------------------------------------------
+
 \section{Evaluation}
-
 \input{evaluation}
-%-------------------------------------------------------------------------------
-%-------------------------------------------------------------------------------
-\section{Conclusion}
 
-\input{conclusion}
 %-------------------------------------------------------------------------------
+
+\section{Conclusion}
+\input{conclusion}
+
+%-------------------------------------------------------------------------------
+
 \bibliographystyle{plain}
 \bibliography{refs}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%-------------------------------------------------------------------------------
+
 \end{document}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%  LocalWords:  endnotes includegraphics fread ptr nobj noindent
 %%  LocalWords:  pdflatex acks
