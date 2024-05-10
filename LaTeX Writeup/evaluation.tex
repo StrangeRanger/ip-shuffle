@@ -1,4 +1,4 @@
-To evaluate the effectiveness of our IP shuffling script, we'll be adding an extra system to the virtual network with a static IP address of \texttt{192.168.1.10}. We'll be setting up an OPNsense instance as the default gateway for all virtual machines. This instance will be assigned the IP address \texttt{192.168.1.1}, and it will act as a simulated router that provides the DHCP service. As shown in Figure~\ref{fig:network-topology}, there will be two Ubuntu Linux machines and one instance of FreeBSD. Each machine will receive an IP address on initial startup starting at \texttt{192.168.1.100}, assigned by OPNsense. We'll give each system six minutes after startup to begin changing its IP address, after which we'll use an arp-scan to obtain the following output:
+To evaluate the effectiveness of our IP shuffling script, we'll be adding an extra system to the virtual network with a static IP address of \texttt{192.168.1.10}. We'll set up an OPNsense instance as the default gateway for all virtual machines. This instance will be assigned the IP address \texttt{192.168.1.1}, acting as a simulated router that provides the DHCP service. As shown in Figure~\ref{fig:network-topology}, there will be two Ubuntu Linux machines and one instance of FreeBSD. Each machine will receive an IP address on initial startup starting at \texttt{192.168.1.100}, assigned by OPNsense. We'll give each system six minutes after startup to begin changing its IP address, after which we'll use an arp-scan using our extra machine to obtain the following output:
 \begin{verbatim}
 192.168.1.1     00:1c:42:c1:e4:da       (Unknown)
 192.168.1.103   00:1c:42:c6:34:d1       (Unknown)
@@ -46,11 +46,11 @@ Let's cross-check the modified IP addresses with their respective MAC addresses 
 \end{tikzpicture}
 
 \subsection{Analysis and Observations}
-The analysis of the IP-shuffling technique involves evaluating its ability to prevent an attacker from gaining valuable reconnaissance information about the network. Here’s a summary of our observations:
+Analyzing the IP shuffling technique involves evaluating its ability to prevent attackers from gaining valuable network reconnaissance information. Here’s a summary of our observations:
 \begin{itemize}
-\item \textbf{IP Address Changes:} The IP addresses changed significantly over the two arp-scans, making it difficult for an attacker to establish a static view of the network.
+\item \textbf{IP Address Changes:} The IP addresses changed significantly over the two arp-scans, making it difficult for an attacker to establish a static network view.
 \item \textbf{MAC Address Consistency:} Each machine retained its MAC address throughout the scans, but the association between MAC addresses and IP addresses changed dynamically.
-\item \textbf{Impact on Reconnaissance:} An attacker would struggle to perform effective reconnaissance and lateral movement as the IP addresses of potential targets keep changing, requiring constant rescanning of the subnet.
+\item \textbf{Impact on Reconnaissance:} An attacker may struggle to perform effective reconnaissance and lateral movement as the IP addresses of potential targets keep changing, requiring constant rescanning of the subnet.
 \end{itemize}
 
 \subsection{Future Work and Limitations}
