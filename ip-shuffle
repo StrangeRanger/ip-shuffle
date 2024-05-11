@@ -35,8 +35,8 @@ gateway="192.168.1.1"
 base_ip="192.168.1."
 ip_start=2
 ip_end=254
-interface="enp0s5"  # Often used on Linux.
-#interface="em0"    # Often used on FreeBSD.
+interface="enp0s3"  # Used by the Linux VMs in VirtualBox.
+#interface="em0"    # Used by FreeBSD VM in VirtualBox.
 netmask="255.255.255.0"
 netmask_cidr="24"
 
