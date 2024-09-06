@@ -100,15 +100,19 @@ generate_random_ip() {
 }
 
 ####
-# Check if the given IP address is available on the network.
+# Check if the given IP address is available on the network, via a ping check.
+#
+# GLOBALS:
+#   - C_INFO : Indicates an informational message to the user.
+#   - C_WARNING : Indicates a warning message to the user.
 #
 # PARAMETERS:
 #   - $1: ip (Required)
 #       - The IP address to check.
 #
 # RETURNS:
-#   - 0: If the IP address is not available.
-#   - 1: If the IP address is available.
+#   - 0: If the IP address is available.
+#   - 1: If the IP address is NOT available.
 check_ip_availability() {
     local ip="$1"
 
@@ -123,7 +127,8 @@ check_ip_availability() {
 }
 
 ####
-# Validate network configuration.
+# Validate network configuration by checking if the IP address is in the same subnet as
+# the gateway.
 #
 # PARAMETERS:
 #   - $1: ip (Required)
@@ -131,23 +136,23 @@ check_ip_availability() {
 #
 # RETURNS:
 #   - 0: If the IP address is in the same subnet as the gateway.
-#   - 1: If the IP address is not in the same subnet as the gateway.
+#   - 1: If the IP address is NOT in the same subnet as the gateway.
 validate_network_config() {
     local ip="$1"
 
     echo "${C_INFO}Validating network configuration for IP '$ip'..."
 
-    IFS=. read -r i1 i2 i3 i4 <<< "$ip"
-    IFS=. read -r g1 g2 g3 g4 <<< "$C_GATEWAY"
-    IFS=. read -r m1 m2 m3 m4 <<< "$C_NETMASK"
+    IFS=. read -r ip1 ip2 ip3 ip4 <<< "$ip"
+    IFS=. read -r gw1 gw2 gw3 gw4 <<< "$C_GATEWAY"
+    IFS=. read -r nm1 nm2 nm3 nm4 <<< "$C_NETMASK"
 
     # Perform bitwise AND to see if base of IP and gateway match.
-    if (( (i1 & m1) != (g1 & m1) )) \
-            || (( (i2 & m2) != (g2 & m2) )) \
-            || (( (i3 & m3) != (g3 & m3) )) \
-            || (( (i4 & m4) != (g4 & m4) )); then
+    if (( (ip1 & nm1) != (gw1 & nm1) )) \
+            || (( (ip2 & nm2) != (gw2 & nm2) )) \
+            || (( (ip3 & nm3) != (gw3 & nm3) )) \
+            || (( (ip4 & nm4) != (gw4 & nm4) )); then
         echo "${C_ERROR}IP address $ip is not in the same subnet as the gateway" \
-             "$C_GATEWAY with netmask $C_NETMASK."
+            "$C_GATEWAY with netmask $C_NETMASK."
         return 1
     fi
 
