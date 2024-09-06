@@ -14,7 +14,7 @@
 #   - Linux
 #   - *BSD
 #
-# Version: v1.0.0
+# Version: v1.0.2
 # License: MIT License
 #          Copyright (c) 2024 Hunter T. (StrangeRanger)
 #
@@ -190,6 +190,15 @@ check_gateway_reachability() {
 #### TODO: Test to see if the subshell properly exits and resets network on error!!!
 # Set the IP address of the network interface.
 #
+# GLOBALS:
+#   - C_INTERFACE : The network interface to interact with.
+#   - C_NETMASK_CIDR : ...
+#   - C_GATEWAY : ...
+#   - C_OS : ...
+#   - C_INFO : Indicates an informational message to the user.
+#   - C_NOTICE : Indicates a notice message to the user.
+#   - C_ERROR : Indicates an error message to the user.
+#
 # PARAMETERS:
 #   - $1: ip (Required)
 #       - The IP address to set.
@@ -249,6 +258,11 @@ reset_network() {
 #   The sleep time is a random number between the min and max values. This is to reduce
 #   the likelihood of multiple machines try to assign an IP address at the same time.
 #
+# GLOBALS:
+#   - C_INFO : Indicates an informational message to the user.
+#   - RANDOM : Generates a random number for the sleep time calculation.
+#       - This is a special variable that is automatically set by Bash.
+#
 # PARAMETERS:
 #   - $1: min (Optional)
 #       - The minimum sleep time.
@@ -270,6 +284,10 @@ timed_sleep() {
 ####
 # Cleanly exit the script.
 #
+# GLOBALS:
+#   - C_WARNING : Indicates a warning message to the user.
+#   - C_NOTE : Indicates an note-based message to the user.
+#
 # PARAMETERS:
 #   - $1: exit_code (Required)
 #       - The type of exit that occurred.
@@ -281,9 +299,6 @@ timed_sleep() {
 clean_exit() {
     local exit_code="$1"
 
-    #if [[ $exit_code == "1" ]]; then
-    #    echo "${C_ERROR}An error occurred" >&2
-    #elif [[ $exit_code == "130" ||  $exit_code == "143" ]]; then
     if [[ $exit_code == "130" ||  $exit_code == "143" ]]; then
         echo ""
         echo "${C_WARNING}Interruption detected" >&2
