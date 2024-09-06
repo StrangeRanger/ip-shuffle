@@ -19,9 +19,13 @@
 #          Copyright (c) 2024 Hunter T. (StrangeRanger)
 #
 ########################################################################################
-####[ Variables ]#######################################################################
-####[[ Modifiable Variables ]]##########################################################
+####[ Global Variables ]################################################################
 
+
+###
+### [ Configurable Variables ]
+### Configure these variables to meet your needs.
+###
 
 ## Set to true if you want to output the script's output to a file and the console.
 readonly C_OUTPUT_TO_FILE=false
@@ -36,9 +40,9 @@ readonly C_INTERFACE="enp0s3"  # Used by the Linux VMs in VirtualBox.
 readonly C_NETMASK="255.255.255.0"
 readonly C_NETMASK_CIDR="24"
 
-
-####[[ General Variables ]]#############################################################
-
+###
+### [ Non-configurable Constants ]
+###
 
 C_OS=$(uname -s)
 readonly C_OS
@@ -59,30 +63,37 @@ if [[ $C_OUTPUT_TO_FILE == true ]]; then
     )
     exec 2>&1
 
-    C_NOTE="[INFO] "
-    C_INFO="[INFO] "
-    C_ERROR="[ERROR] "
-    C_WARNING="[WARNING] "
-    C_NOTICE="[NOTICE] "
-    C_SUCCESS="[INFO] "
+    readonly C_NOTE="[INFO] "
+    readonly C_INFO="[INFO] "
+    readonly C_ERROR="[ERROR] "
+    readonly C_WARNING="[WARNING] "
+    readonly C_NOTICE="[NOTICE] "
+    readonly C_SUCCESS="[INFO] "
 else
-    C_NOTE="${C_CYAN}[INFO]${C_NC} "
-    C_INFO="${C_BLUE}[INFO]${C_NC} "
-    C_ERROR="${C_RED}[ERROR]${C_NC} "
-    C_WARNING="${C_YELLOW}[WARNING]${C_NC} "
-    C_NOTICE="${C_YELLOW}[NOTICE]${C_NC} "
-    C_SUCCESS="${C_GREEN}[INFO]${C_NC} "
+    readonly C_NOTE="${C_CYAN}[INFO]${C_NC} "
+    readonly C_INFO="${C_BLUE}[INFO]${C_NC} "
+    readonly C_ERROR="${C_RED}[ERROR]${C_NC} "
+    readonly C_WARNING="${C_YELLOW}[WARNING]${C_NC} "
+    readonly C_NOTICE="${C_YELLOW}[NOTICE]${C_NC} "
+    readonly C_SUCCESS="${C_GREEN}[INFO]${C_NC} "
 fi
-readonly C_NOTE C_INFO C_ERROR C_WARNING C_NOTICE C_SUCCESS
 
 
 ####[ Functions ]#######################################################################
 
 
 ####
-# Description:
-#   Generate a random IP address within a range, specified by the network variables
-#   above.
+# Generate a random IP address within a range, specified by the network variables above.
+#
+# GLOBALS:
+#   - C_BASE_IP : Used as the base IP to which the random last octet is appended.
+#   - C_IP_START : Defines the minimum value for the last octet.
+#   - C_IP_END : Defines the maximum value for the last octet.
+#   - RANDOM : Generates a random number for the last octet range calculation.
+#       - This is a special variable that is automatically set by Bash.
+#
+# OUTPUTS:
+#   The generated IP address.
 generate_random_ip() {
     local ip="${C_BASE_IP}$((RANDOM % (C_IP_END - C_IP_START + 1) + C_IP_START))"
     echo "$ip"
