@@ -130,6 +130,12 @@ check_ip_availability() {
 # Validate network configuration by checking if the IP address is in the same subnet as
 # the gateway.
 #
+# GLOBALS:
+#   - C_GATEWAY : Break down the gateway IP address into octets, to perform bitwise AND.
+#   - C_NETMASK : Break down the netmask IP address into octets, to perform bitwise AND.
+#   - C_INFO : Indicates an informational message to the user.
+#   - C_ERROR : Indicates an error message to the user.
+#
 # PARAMETERS:
 #   - $1: ip (Required)
 #       - The IP address to validate.
