@@ -119,7 +119,7 @@ check_ip_availability() {
     echo "${C_INFO}Checking IP address availability of '$ip'..."
 
     if ping -c 1 -W 1 "$ip" &>/dev/null; then
-        echo "${C_WARNING}IP $ip is already in use."
+        echo "${C_WARNING}IP $ip is already in use." >&2
         return 1
     fi
 
@@ -158,7 +158,7 @@ validate_network_config() {
             || (( (ip3 & nm3) != (gw3 & nm3) )) \
             || (( (ip4 & nm4) != (gw4 & nm4) )); then
         echo "${C_ERROR}IP address $ip is not in the same subnet as the gateway" \
-            "$C_GATEWAY with netmask $C_NETMASK."
+            "$C_GATEWAY with netmask $C_NETMASK." >&2
         return 1
     fi
 
@@ -175,7 +175,7 @@ check_gateway_reachability() {
     echo "${C_INFO}Checking reachability of gateway: $C_GATEWAY"
 
     if ! ping -c 3 -W 2 "$C_GATEWAY" &>/dev/null; then
-        echo "${C_ERROR}Gateway $C_GATEWAY is not reachable."
+        echo "${C_ERROR}Gateway $C_GATEWAY is not reachable." >&2
         return 1
     fi
 
@@ -220,7 +220,7 @@ set_ip_address() {
             esac
         fi
     } || {
-        echo "${C_ERROR}An error occurred while trying to set a new IP Address."
+        echo "${C_ERROR}An error occurred while trying to set a new IP Address." >&2
         reset_network
         clean_exit 1
     }
@@ -236,7 +236,7 @@ reset_network() {
     if dhclient "$C_INTERFACE"; then
         echo "${C_SUCCESS}DHCP lease successfully renewed on $C_OS."
     else
-        echo "${C_ERROR}Failed to renew DHCP lease on $C_OS."
+        echo "${C_ERROR}Failed to renew DHCP lease on $C_OS." >&2
     fi
 
 }
@@ -281,11 +281,11 @@ clean_exit() {
     local exit_code="$1"
 
     #if [[ $exit_code == "1" ]]; then
-    #    echo "${C_ERROR}An error occurred"
+    #    echo "${C_ERROR}An error occurred" >&2
     #elif [[ $exit_code == "130" ||  $exit_code == "143" ]]; then
     if [[ $exit_code == "130" ||  $exit_code == "143" ]]; then
         echo ""
-        echo "${C_WARNING}Interruption detected"
+        echo "${C_WARNING}Interruption detected" >&2
     fi
 
     echo "${C_NOTE}Exiting script..."
@@ -306,30 +306,30 @@ trap 'clean_exit "143"' SIGTERM
 
 
 if [[ $EUID -ne 0 ]]; then
-    echo "${C_ERROR}This script must be run as root."
+    echo "${C_ERROR}This script must be run as root." >&2
     clean_exit 1
 fi
 
 if ! hash ip &>/dev/null && ! hash ifconfig &>/dev/null; then
-    echo "${C_ERROR}ip and ifconfig command not found."
+    echo "${C_ERROR}ip and ifconfig command not found." >&2
     clean_exit 1
 fi
 
 case $C_OS in
     *BSD)
         if ! ifconfig "$C_INTERFACE" &>/dev/null; then
-            echo "${C_ERROR}Network interface '$C_INTERFACE' not found."
+            echo "${C_ERROR}Network interface '$C_INTERFACE' not found." >&2
             clean_exit 1
         fi
         ;;
     Linux)
         if ! ip addr show "$C_INTERFACE" &>/dev/null; then
-            echo "${C_ERROR}Network interface '$C_INTERFACE' not found."
+            echo "${C_ERROR}Network interface '$C_INTERFACE' not found." >&2
             clean_exit 1
         fi
         ;;
     *)
-        echo "${C_ERROR}Unsupported operating system."
+        echo "${C_ERROR}Unsupported operating system." >&2
         clean_exit 1
         ;;
 esac
