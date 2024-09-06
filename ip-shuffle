@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 #
-# Name: ip-shuffle
-#
-# Description:
-#   This script is used to assign a random IP address to a network interface.
+# This script is used to assign a random IP address to a network interface.
 #
 # Note:
 #   This script can be enhanced by either keeping a list of existing IP addresses that
@@ -27,34 +24,34 @@
 
 
 ## Set to true if you want to output the script's output to a file and the console.
-_OUTPUT_TO_FILE=false
-readonly _OUTPUT_TO_FILE
+readonly C_OUTPUT_TO_FILE=false
 
 ## All the variables below should be modified to meet your network configurations.
-gateway="192.168.1.1"
-base_ip="192.168.1."
-ip_start=2
-ip_end=254
-interface="enp0s3"  # Used by the Linux VMs in VirtualBox.
-#interface="em0"    # Used by FreeBSD VM in VirtualBox.
-netmask="255.255.255.0"
-netmask_cidr="24"
+readonly C_GATEWAY="192.168.1.1"
+readonly C_BASE_IP="192.168.1."
+readonly C_IP_START=2
+readonly C_IP_END=254
+readonly C_INTERFACE="enp0s3"  # Used by the Linux VMs in VirtualBox.
+#readonly C_INTERFACE="em0"  # Used by FreeBSD VM in VirtualBox.
+readonly C_NETMASK="255.255.255.0"
+readonly C_NETMASK_CIDR="24"
 
 
 ####[[ General Variables ]]#############################################################
 
 
-_OS=$(uname -s)
-readonly _OS
+C_OS=$(uname -s)
+readonly C_OS
 
-yellow="$(printf '\033[1;33m')"
-green="$(printf '\033[0;32m')"
-blue="$(printf '\033[0;34m')"
-cyan="$(printf '\033[0;36m')"
-red="$(printf '\033[1;31m')"
-nc="$(printf '\033[0m')"
+C_YELLOW="$(printf '\033[1;33m')"
+C_GREEN="$(printf '\033[0;32m')"
+C_BLUE="$(printf '\033[0;34m')"
+C_CYAN="$(printf '\033[0;36m')"
+C_RED="$(printf '\033[1;31m')"
+C_NC="$(printf '\033[0m')"
+readonly C_YELLOW C_GREEN C_BLUE C_CYAN C_RED C_NC
 
-if [[ $_OUTPUT_TO_FILE == true ]]; then
+if [[ $C_OUTPUT_TO_FILE == true ]]; then
     exec > >(
         while IFS= read -r line; do
             printf "[%s] %s\n" "$(date "+%Y-%m-%d %H:%M:%S")" "$line"
@@ -62,20 +59,21 @@ if [[ $_OUTPUT_TO_FILE == true ]]; then
     )
     exec 2>&1
 
-    note="[INFO]"
-    info="[INFO]"
-    error="[ERROR]"
-    warning="[WARNING]"
-    notice="[NOTICE]"
-    success="[INFO]"
+    C_NOTE="[INFO] "
+    C_INFO="[INFO] "
+    C_ERROR="[ERROR] "
+    C_WARNING="[WARNING] "
+    C_NOTICE="[NOTICE] "
+    C_SUCCESS="[INFO] "
 else
-    note="${cyan}[INFO]${nc}"
-    info="${blue}[INFO]${nc}"
-    error="${red}[ERROR]${nc}"
-    warning="${yellow}[WARNING]${nc}"
-    notice="${yellow}[NOTICE]${nc}"
-    success="${green}[INFO]${nc}"
+    C_NOTE="${C_CYAN}[INFO]${C_NC} "
+    C_INFO="${C_BLUE}[INFO]${C_NC} "
+    C_ERROR="${C_RED}[ERROR]${C_NC} "
+    C_WARNING="${C_YELLOW}[WARNING]${C_NC} "
+    C_NOTICE="${C_YELLOW}[NOTICE]${C_NC} "
+    C_SUCCESS="${C_GREEN}[INFO]${C_NC} "
 fi
+readonly C_NOTE C_INFO C_ERROR C_WARNING C_NOTICE C_SUCCESS
 
 
 ####[ Functions ]#######################################################################
@@ -86,7 +84,7 @@ fi
 #   Generate a random IP address within a range, specified by the network variables
 #   above.
 generate_random_ip() {
-    local ip="$base_ip$((RANDOM % (ip_end - ip_start + 1) + ip_start))"
+    local ip="${C_BASE_IP}$((RANDOM % (C_IP_END - C_IP_START + 1) + C_IP_START))"
     echo "$ip"
 }
 
@@ -104,10 +102,10 @@ generate_random_ip() {
 check_ip_availability() {
     local ip="$1"
 
-    echo "${info} Checking IP address availability of '$ip'..."
+    echo "${C_INFO}Checking IP address availability of '$ip'..."
 
     if ping -c 1 -W 1 "$ip" &>/dev/null; then
-        echo "${warning} IP $ip is already in use."
+        echo "${C_WARNING}IP $ip is already in use."
         return 1
     fi
 
@@ -128,19 +126,19 @@ check_ip_availability() {
 validate_network_config() {
     local ip="$1"
 
-    echo "${info} Validating network configuration for IP '$ip'..."
+    echo "${C_INFO}Validating network configuration for IP '$ip'..."
 
     IFS=. read -r i1 i2 i3 i4 <<< "$ip"
-    IFS=. read -r g1 g2 g3 g4 <<< "$gateway"
-    IFS=. read -r m1 m2 m3 m4 <<< "$netmask"
+    IFS=. read -r g1 g2 g3 g4 <<< "$C_GATEWAY"
+    IFS=. read -r m1 m2 m3 m4 <<< "$C_NETMASK"
 
     # Perform bitwise AND to see if base of IP and gateway match.
     if (( (i1 & m1) != (g1 & m1) )) \
             || (( (i2 & m2) != (g2 & m2) )) \
             || (( (i3 & m3) != (g3 & m3) )) \
             || (( (i4 & m4) != (g4 & m4) )); then
-        echo "${error} IP address $ip is not in the same subnet as the gateway" \
-             "$gateway with netmask $netmask."
+        echo "${C_ERROR}IP address $ip is not in the same subnet as the gateway" \
+             "$C_GATEWAY with netmask $C_NETMASK."
         return 1
     fi
 
@@ -155,10 +153,10 @@ validate_network_config() {
 #   - 0: If the gateway is reachable.
 #   - 1: If the gateway is not reachable.
 check_gateway_reachability() {
-    echo "${info} Checking reachability of gateway: $gateway"
+    echo "${C_INFO}Checking reachability of gateway: $C_GATEWAY"
 
-    if ! ping -c 3 -W 2 "$gateway" &>/dev/null; then
-        echo "${error} Gateway $gateway is not reachable."
+    if ! ping -c 3 -W 2 "$C_GATEWAY" &>/dev/null; then
+        echo "${C_ERROR}Gateway $C_GATEWAY is not reachable."
         return 1
     fi
 
@@ -175,36 +173,36 @@ check_gateway_reachability() {
 set_ip_address() {
     local ip="$1"
 
-    echo "${info} Setting IP address to '$ip' on interface '$interface'..."
+    echo "${C_INFO}Setting IP address to '$ip' on interface '$C_INTERFACE'..."
 
     {
         if hash ip &>/dev/null; then
-            ip addr flush dev "$interface" \
-            && ip addr add "$ip"/"$netmask_cidr" dev "$interface" \
+            ip addr flush dev "$C_INTERFACE" \
+            && ip addr add "$ip"/"$C_NETMASK_CIDR" dev "$C_INTERFACE" \
             && {
                 ip route del default \
-                || echo "${notice} No default route to delete."
+                || echo "${C_NOTICE}No default route to delete."
             } \
-            && ip link set "$interface" up \
-            && ip route add default via "$gateway"
+            && ip link set "$C_INTERFACE" up \
+            && ip route add default via "$C_GATEWAY"
         else
-            case $_OS in
+            case $C_OS in
                 *BSD)
-                    ifconfig "$interface" inet "$ip" netmask "$netmask" \
+                    ifconfig "$C_INTERFACE" inet "$ip" netmask "$C_NETMASK" \
                     && {
                         route delete default \
-                        || echo "${notice} No default route to delete."
+                        || echo "${C_NOTICE}No default route to delete."
                     } \
-                    && route add default "$gateway"
+                    && route add default "$C_GATEWAY"
                     ;;
                 Linux)
-                    ifconfig "$interface" "$ip" netmask "$netmask" \
-                    && route add default gw "$gateway"
+                    ifconfig "$C_INTERFACE" "$ip" netmask "$C_NETMASK" \
+                    && route add default gw "$C_GATEWAY"
                     ;;
             esac
         fi
     } || {
-        echo "${error} An error occurred while trying to set a new IP Address."
+        echo "${C_ERROR}An error occurred while trying to set a new IP Address."
         reset_network
         clean_exit 1
     }
@@ -215,13 +213,13 @@ set_ip_address() {
 #   Reset network configurations on Linux and BSD. This is used as a fallback method if
 #   setting a new IP address fails.
 reset_network() {
-    echo "${note} Resetting network configurations on $_OS..."
-    echo "${info} Renewing DHCP lease on $_OS for interface '$interface'..."
+    echo "${C_NOTE}Resetting network configurations on $C_OS..."
+    echo "${C_INFO}Renewing DHCP lease on $C_OS for interface '$C_INTERFACE'..."
 
-    if dhclient "$interface"; then
-        echo "${success} DHCP lease successfully renewed on $_OS."
+    if dhclient "$C_INTERFACE"; then
+        echo "${C_SUCCESS}DHCP lease successfully renewed on $C_OS."
     else
-        echo "${error} Failed to renew DHCP lease on $_OS."
+        echo "${C_ERROR}Failed to renew DHCP lease on $C_OS."
     fi
 
 }
@@ -249,7 +247,7 @@ timed_sleep() {
     local max="${2:-30}"
     local sleep_time=$((RANDOM % (max - min + 1) + min))
 
-    echo "${info} Sleeping for $sleep_time seconds..."
+    echo "${C_INFO}Sleeping for $sleep_time seconds..."
     sleep $sleep_time
 }
 
@@ -269,14 +267,14 @@ clean_exit() {
     local exit_code="$1"
 
     #if [[ $exit_code == "1" ]]; then
-    #    echo "${error} An error occurred"
+    #    echo "${C_ERROR}An error occurred"
     #elif [[ $exit_code == "130" ||  $exit_code == "143" ]]; then
     if [[ $exit_code == "130" ||  $exit_code == "143" ]]; then
         echo ""
-        echo "${warning} Interruption detected"
+        echo "${C_WARNING}Interruption detected"
     fi
 
-    echo "${note} Exiting script..."
+    echo "${C_NOTE}Exiting script..."
     exit "$exit_code"
 }
 
@@ -294,30 +292,30 @@ trap 'clean_exit "143"' SIGTERM
 
 
 if [[ $EUID -ne 0 ]]; then
-    echo "${error} This script must be run as root."
+    echo "${C_ERROR}This script must be run as root."
     clean_exit 1
 fi
 
 if ! hash ip &>/dev/null && ! hash ifconfig &>/dev/null; then
-    echo "${error} ip and ifconfig command not found."
+    echo "${C_ERROR}ip and ifconfig command not found."
     clean_exit 1
 fi
 
-case $_OS in
+case $C_OS in
     *BSD)
-        if ! ifconfig "$interface" &>/dev/null; then
-            echo "${error} Network interface '$interface' not found."
+        if ! ifconfig "$C_INTERFACE" &>/dev/null; then
+            echo "${C_ERROR}Network interface '$C_INTERFACE' not found."
             clean_exit 1
         fi
         ;;
     Linux)
-        if ! ip addr show "$interface" &>/dev/null; then
-            echo "${error} Network interface '$interface' not found."
+        if ! ip addr show "$C_INTERFACE" &>/dev/null; then
+            echo "${C_ERROR}Network interface '$C_INTERFACE' not found."
             clean_exit 1
         fi
         ;;
     *)
-        echo "${error} Unsupported operating system."
+        echo "${C_ERROR}Unsupported operating system."
         clean_exit 1
         ;;
 esac
@@ -328,19 +326,19 @@ esac
 
 new_ip="$(generate_random_ip)"
 
-echo "${note} Starting IP Shuffle..."
+echo "${C_NOTE}Starting IP Shuffle..."
 
 while true; do
     timed_sleep
 
     if ! check_ip_availability "$new_ip"; then
-        echo "${info} Trying a different IP..."
+        echo "${C_INFO}Trying a different IP..."
         new_ip="$(generate_random_ip)"
         continue
     fi
 
     if ! validate_network_config "$new_ip"; then
-        echo "${note} Ensure network configurations are correctly set in the script."
+        echo "${C_NOTE}Ensure network configurations are correctly set in the script."
         reset_network
         clean_exit 1
     fi
@@ -348,11 +346,11 @@ while true; do
     set_ip_address "$new_ip"
 
     if ! check_gateway_reachability; then
-        echo "${note} Ensure the gateway is correctly set in the script."
+        echo "${C_NOTE}Ensure the gateway is correctly set in the script."
         reset_network
         clean_exit 1
     fi
 
-    echo "${success} IP address set successfully."
+    echo "${C_SUCCESS}IP address set successfully."
     break
 done
