@@ -100,14 +100,13 @@ generate_random_ip() {
 }
 
 ####
-# Description:
-#   Check if the given IP address is available on the network.
+# Check if the given IP address is available on the network.
 #
-# Parameters:
+# PARAMETERS:
 #   - $1: ip (Required)
-#       - Description: The IP address to check.
+#       - The IP address to check.
 #
-# Returns:
+# RETURNS:
 #   - 0: If the IP address is not available.
 #   - 1: If the IP address is available.
 check_ip_availability() {
@@ -124,14 +123,13 @@ check_ip_availability() {
 }
 
 ####
-# Description:
-#   Validate network configuration.
+# Validate network configuration.
 #
-# Parameters:
+# PARAMETERS:
 #   - $1: ip (Required)
-#       - Description: The IP address to validate.
+#       - The IP address to validate.
 #
-# Returns:
+# RETURNS:
 #   - 0: If the IP address is in the same subnet as the gateway.
 #   - 1: If the IP address is not in the same subnet as the gateway.
 validate_network_config() {
@@ -157,10 +155,9 @@ validate_network_config() {
 }
 
 ####
-# Description:
-#   Check gateway reachability.
+# Check gateway reachability.
 #
-# Returns:
+# RETURNS:
 #   - 0: If the gateway is reachable.
 #   - 1: If the gateway is not reachable.
 check_gateway_reachability() {
@@ -175,12 +172,11 @@ check_gateway_reachability() {
 }
 
 ####
-# Description:
-#   Set the IP address of the network interface.
+# Set the IP address of the network interface.
 #
-# Parameters:
+# PARAMETERS:
 #   - $1: ip (Required)
-#       - Description: The IP address to set.
+#       - The IP address to set.
 set_ip_address() {
     local ip="$1"
 
@@ -220,9 +216,8 @@ set_ip_address() {
 }
 
 ####
-# Description:
-#   Reset network configurations on Linux and BSD. This is used as a fallback method if
-#   setting a new IP address fails.
+# Reset network configurations on Linux and BSD. This is used as a fallback method if
+# setting a new IP address fails.
 reset_network() {
     echo "${C_NOTE}Resetting network configurations on $C_OS..."
     echo "${C_INFO}Renewing DHCP lease on $C_OS for interface '$C_INTERFACE'..."
@@ -236,21 +231,19 @@ reset_network() {
 }
 
 ####
-# Description:
-#   Generate a random sleep time between the given range.
+# Generate a random sleep time between the given range.
 #
-# Parameters:
+# NOTE:
+#   The sleep time is a random number between the min and max values. This is to reduce
+#   the likelihood of multiple machines try to assign an IP address at the same time.
+#
+# PARAMETERS:
 #   - $1: min (Optional)
-#       - Description: The minimum sleep time.
+#       - The minimum sleep time.
 #       - Default: 1
 #   - $2: max (Optional)
-#       - Description: The maximum sleep time.
+#       - The maximum sleep time.
 #       - Default: 30
-#
-# Note:
-#   - The sleep time is a random number between the min and max values. This is to
-#     reduce the likelihood of multiple machines try to assign an IP address at the same
-#     time.
 #
 # shellcheck disable=SC2120
 timed_sleep() {
@@ -263,12 +256,11 @@ timed_sleep() {
 }
 
 ####
-# Description:
-#   Cleanly exit the script.
+# Cleanly exit the script.
 #
-# Parameters:
+# PARAMETERS:
 #   - $1: exit_code (Required)
-#       - Description: The type of exit that occurred.
+#       - The type of exit that occurred.
 #       - Acceptable values:
 #           - 0: Clean exit.
 #           - 1: Error occurred.
