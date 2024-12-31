@@ -1,5 +1,7 @@
 # IP Shuffle
 
+[![Project Tracker](https://img.shields.io/badge/repo%20status-Project%20Tracker-lightgrey)](https://wiki.hthompson.dev/en/project-tracker)
+
 IP Shuffle is a mid-term project for my Cyber Defense class at EWU. The project instructions was to implement a Moving Target Defense (MTD) technique, to which Chelsea Edwards and I chose IP Shuffle. This MTD is a technique that changes the IP address of a machine every few minutes to make it harder for an adversary to target the machine.
 
 In this project, we have three virtual machines that will change their IP addresses every 3 minutes, and an OPNsense firewall that will route traffic between the machines and the internet. A single script is placed on each machine, called `ip-shuffle`, that performs the IP address change. A cron job is then set up to run this script every 3 minutes.
