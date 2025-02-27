@@ -16,10 +16,10 @@ If you are interested in observing the IP Shuffle technique in action within our
 
 There are four OVA images provided that you will need to download and import:
 
-- [Computer 1 OVA](https://vms3.hthompson.dev/ova/ip-shuffle/Computer%201.ova)
-- [Computer 2 OVA](https://vms3.hthompson.dev/ova/ip-shuffle/Computer%202.ova)
-- [Computer 3 OVA](https://vms3.hthompson.dev/ova/ip-shuffle/Computer%203.ova)
-- [OPNsense OVA](https://vms3.hthompson.dev/ova/ip-shuffle/OPNsense.ova)
+- [Computer 1 OVA](https://vms3.sfo3.cdn.digitaloceanspaces.com/ova/ip-shuffle/Computer%201.ova)
+- [Computer 2 OVA](https://vms3.sfo3.cdn.digitaloceanspaces.com/ova/ip-shuffle/Computer%202.ova)
+- [Computer 3 OVA](https://vms3.sfo3.cdn.digitaloceanspaces.com/ova/ip-shuffle/Computer%203.ova)
+- [OPNsense OVA](https://vms3.sfo3.cdn.digitaloceanspaces.com/ova/ip-shuffle/OPNsense.ova)
 
 ### Network Configuration
 
