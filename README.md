@@ -1,5 +1,8 @@
 # IP Shuffle
 
+[![Project Tracker](https://img.shields.io/badge/repo%20status-Project%20Tracker-lightgrey)](https://hthompson.dev/project-tracker#project-797953903)
+[![GitHub License](https://img.shields.io/github/license/StrangeRanger/ip-shuffle)](LICENSE)
+
 IP Shuffle is a mid-term project for my Cyber Defense class at EWU. The project instructions was to implement a Moving Target Defense (MTD) technique, to which Chelsea Edwards and I chose IP Shuffle. This MTD is a technique that changes the IP address of a machine every few minutes to make it harder for an adversary to target the machine.
 
 In this project, we have three virtual machines that will change their IP addresses every 3 minutes, and an OPNsense firewall that will route traffic between the machines and the internet. A single script is placed on each machine, called `ip-shuffle`, that performs the IP address change. A cron job is then set up to run this script every 3 minutes.
@@ -14,10 +17,10 @@ If you are interested in observing the IP Shuffle technique in action within our
 
 There are four OVA images provided that you will need to download and import:
 
-- [Computer 1 OVA](https://vms3.hthompson.dev/ova/ip-shuffle/Computer%201.ova)
-- [Computer 2 OVA](https://vms3.hthompson.dev/ova/ip-shuffle/Computer%202.ova)
-- [Computer 3 OVA](https://vms3.hthompson.dev/ova/ip-shuffle/Computer%203.ova)
-- [OPNsense OVA](https://vms3.hthompson.dev/ova/ip-shuffle/OPNsense.ova)
+- [Computer 1 OVA](https://vms3.sfo3.cdn.digitaloceanspaces.com/ova/ip-shuffle/Computer%201.ova)
+- [Computer 2 OVA](https://vms3.sfo3.cdn.digitaloceanspaces.com/ova/ip-shuffle/Computer%202.ova)
+- [Computer 3 OVA](https://vms3.sfo3.cdn.digitaloceanspaces.com/ova/ip-shuffle/Computer%203.ova)
+- [OPNsense OVA](https://vms3.sfo3.cdn.digitaloceanspaces.com/ova/ip-shuffle/OPNsense.ova)
 
 ### Network Configuration
 
