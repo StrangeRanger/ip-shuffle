@@ -1,7 +1,6 @@
 # IP Shuffle
 
 [![Project Tracker](https://img.shields.io/badge/repo%20status-Project%20Tracker-lightgrey)](https://hthompson.dev/project-tracker#project-797953903)
-[![GitHub License](https://img.shields.io/github/license/StrangeRanger/ip-shuffle)](LICENSE)
 [![Style Guide](https://img.shields.io/badge/code%20style-Style%20Guide-blueviolet)](https://github.com/StrangeRanger/bash-style-guide)
 
 IP Shuffle is a mid-term project for my Cyber Defense class at EWU. The project instructions was to implement a Moving Target Defense (MTD) technique, to which Chelsea Edwards and I chose IP Shuffle. This MTD is a technique that changes the IP address of a machine every few minutes to make it harder for an adversary to target the machine.
@@ -75,3 +74,7 @@ For each machine, including OPNsense, you can use the following credentials:
   - Password: `password`
   - The `vbox` user has sudo privileges, allowing commands to be executed as root.
   - OPNsense does not include the `vbox` user.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
