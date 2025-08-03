@@ -13,6 +13,16 @@ For a more in depth look and understanding of the project, please refer to the [
 
 If you are interested in observing the IP Shuffle technique in action within our tested environment outlined in the PDF, you can use the provided OVA images. These images are pre-configured with the necessary software and scripts to run IP Shuffle. All that you need to do is import the images into VirtualBox, configure the network settings, and modify the cron job to run the `ip-shuffle` script every 3 minutes.
 
+> [!IMPORTANT]
+> Since the initial release of this project, `ip-shuffle` has been updated with slight modifications, improvements, and bug fixes. The OVA images below do **NOT** include the latest version of `ip-shuffle`. If you want to use the latest version, execute the following commands on each machine after importing the OVA images and before running the cron job:
+>
+> ```bash
+> cd /usr/local/sbin
+> rm ip-shuffle
+> curl -O https://raw.githubusercontent.com/StrangeRanger/ip-shuffle/refs/heads/main/ip-shuffle
+> chmod +x ip-shuffle
+> ```
+
 ### OVA Images
 
 There are four OVA images provided that you will need to download and import:
