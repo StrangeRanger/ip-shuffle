@@ -14,12 +14,12 @@
 #   - Linux
 #   - *BSD
 #
-# Version: v1.0.2
+# Version: v1.0.3
 # License: MIT License
 #          Copyright (c) 2024 Hunter T. (StrangeRanger)
 #
-########################################################################################
-####[ Global Variables ]################################################################
+############################################################################################
+####[ Global Variables ]####################################################################
 
 
 ###
@@ -27,7 +27,7 @@
 ### Configure these variables to meet your needs.
 ###
 
-## Set to true if you want to output the script's output to a file and the console.
+## Set to true if you want to direct the script's output to a file and the console.
 readonly C_OUTPUT_TO_FILE=false
 
 ## All the variables below should be modified to meet your network configurations.
@@ -79,18 +79,11 @@ else
 fi
 
 
-####[ Functions ]#######################################################################
+####[ Functions ]###########################################################################
 
 
 ####
 # Generate a random IP address within a range, specified by the network variables above.
-#
-# GLOBALS:
-#   - C_BASE_IP : Used as the base IP to which the random last octet is appended.
-#   - C_IP_START : Defines the minimum value for the last octet.
-#   - C_IP_END : Defines the maximum value for the last octet.
-#   - RANDOM : Generates a random number for the last octet range calculation.
-#       - This is a special variable that is automatically set by Bash.
 #
 # OUTPUTS:
 #   The generated IP address.
@@ -101,10 +94,6 @@ generate_random_ip() {
 
 ####
 # Check if the given IP address is available on the network, via ICMP.
-#
-# GLOBALS:
-#   - C_INFO : Indicates an informational message to the user.
-#   - C_WARNING : Indicates a warning message to the user.
 #
 # PARAMETERS:
 #   - $1: ip (Required)
@@ -129,12 +118,6 @@ check_ip_availability() {
 ####
 # Validate network configuration by checking if the IP address is in the same subnet as
 # the gateway.
-#
-# GLOBALS:
-#   - C_GATEWAY : Break down the gateway IP address into octets, to perform bitwise AND.
-#   - C_NETMASK : Break down the netmask IP address into octets, to perform bitwise AND.
-#   - C_INFO : Indicates an informational message to the user.
-#   - C_ERROR : Indicates an error message to the user.
 #
 # PARAMETERS:
 #   - $1: ip (Required)
@@ -168,11 +151,6 @@ validate_network_config() {
 ####
 # Check gateway reachability.
 #
-# GLOBALS:
-#   - C_GATEWAY : The gateway IP address to check.
-#   - C_INFO : Indicates an informational message to the user.
-#   - C_ERROR : Indicates an error message to the user.
-#
 # RETURNS:
 #   - 0: If the gateway is reachable.
 #   - 1: If the gateway is NOT reachable.
@@ -187,17 +165,8 @@ check_gateway_reachability() {
     return 0
 }
 
-#### TODO: Test to see if the subshell properly exits and resets network on error!!!
+####
 # Set the IP address of the network interface.
-#
-# GLOBALS:
-#   - C_INTERFACE : The network interface to interact with.
-#   - C_NETMASK_CIDR : ...
-#   - C_GATEWAY : ...
-#   - C_OS : ...
-#   - C_INFO : Indicates an informational message to the user.
-#   - C_NOTICE : Indicates a notice message to the user.
-#   - C_ERROR : Indicates an error message to the user.
 #
 # PARAMETERS:
 #   - $1: ip (Required)
@@ -208,11 +177,7 @@ set_ip_address() {
     echo "${C_INFO}Setting IP address to '$ip' on interface '$C_INTERFACE'..."
 
     (
-        trap '{
-            echo "${C_ERROR}An error occurred while trying to set a new IP Address." >&2
-            reset_network
-            exit 1
-        }' ERR
+        set -e  # Exit subshell immediately on any error.
 
         if hash ip &>/dev/null; then
             ip addr flush dev "$C_INTERFACE"
@@ -233,7 +198,11 @@ set_ip_address() {
                     ;;
             esac
         fi
-    ) || clean_exit 1
+    ) || {
+        echo "${C_ERROR}An error occurred while trying to set a new IP Address." >&2
+        reset_network
+        clean_exit 1
+    }
 }
 
 ####
@@ -258,11 +227,6 @@ reset_network() {
 #   The sleep time is a random number between the min and max values. This is to reduce
 #   the likelihood of multiple machines try to assign an IP address at the same time.
 #
-# GLOBALS:
-#   - C_INFO : Indicates an informational message to the user.
-#   - RANDOM : Generates a random number for the sleep time calculation.
-#       - This is a special variable that is automatically set by Bash.
-#
 # PARAMETERS:
 #   - $1: min (Optional)
 #       - The minimum sleep time.
@@ -283,10 +247,6 @@ timed_sleep() {
 
 ####
 # Cleanly exit the script.
-#
-# GLOBALS:
-#   - C_WARNING : Indicates a warning message to the user.
-#   - C_NOTE : Indicates an note-based message to the user.
 #
 # PARAMETERS:
 #   - $1: exit_code (Required)
@@ -309,7 +269,7 @@ clean_exit() {
 }
 
 
-####[ Error Traps ]#####################################################################
+####[ Error Traps ]#########################################################################
 #### This section sets up error traps to ensure that the script exits gracefully.
 
 
@@ -317,7 +277,7 @@ trap 'clean_exit "130"' SIGINT
 trap 'clean_exit "143"' SIGTERM
 
 
-####[ Verification ]####################################################################
+####[ Verification ]########################################################################
 #### This section ensures that certain conditions are met before the script continues.
 
 
@@ -351,7 +311,7 @@ case $C_OS in
 esac
 
 
-####[ Main ]############################################################################
+####[ Main ]################################################################################
 
 
 new_ip="$(generate_random_ip)"
